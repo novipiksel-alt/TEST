@@ -8,9 +8,6 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- EmailJS SDK za direktno slanje mailova -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    
     <!-- Google Fonts: Orbitron & Fira Code -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -58,12 +55,6 @@
             background: rgba(30, 41, 59, 0.85);
         }
 
-        .robo-card:hover::before {
-            opacity: 1;
-            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #3b82f6);
-        }
-
-        /* Posebno istaknuta AI kartica */
         .featured-ai-card {
             background: linear-gradient(135deg, rgba(30, 27, 75, 0.85), rgba(15, 23, 42, 0.9));
             backdrop-filter: blur(20px);
@@ -82,24 +73,12 @@
             background: linear-gradient(90deg, #ec4899, #8b5cf6, #3b82f6);
         }
 
-        .featured-ai-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            border-color: rgba(168, 85, 247, 0.9);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9), 0 0 50px rgba(168, 85, 247, 0.5);
-        }
-
         .btn-robo {
             background: linear-gradient(135deg, rgba(37, 99, 235, 0.9), rgba(79, 70, 229, 0.9));
             backdrop-filter: blur(12px);
             border: 1px solid rgba(147, 197, 253, 0.4);
             box-shadow: 0 0 20px rgba(37, 99, 235, 0.35);
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .btn-robo:hover {
-            transform: translateY(-2px) scale(1.03);
-            box-shadow: 0 0 35px rgba(37, 99, 235, 0.7);
-            border-color: rgba(147, 197, 253, 0.8);
         }
 
         .btn-ai {
@@ -110,29 +89,20 @@
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .btn-ai:hover {
-            transform: translateY(-2px) scale(1.03);
-            box-shadow: 0 0 40px rgba(236, 72, 153, 0.8);
-            border-color: rgba(244, 114, 182, 0.9);
-        }
-
         .glow-text { text-shadow: 0 0 15px rgba(59, 130, 246, 0.6); }
         .ai-glow-text { text-shadow: 0 0 20px rgba(168, 85, 247, 0.8); }
         .cyber-badge { box-shadow: 0 0 12px rgba(59, 130, 246, 0.3); }
-        .cyber-badge-ai { box-shadow: 0 0 15px rgba(168, 85, 247, 0.5); }
 
-        /* Matrix Sat Stilovi */
         .matrix-clock-box {
-            background: rgba(2, 6, 23, 0.85);
+            background: rgba(2, 6, 23, 0.9);
             border: 1px solid rgba(34, 197, 94, 0.35);
-            box-shadow: 0 0 25px rgba(34, 197, 94, 0.15), inset 0 0 15px rgba(34, 197, 94, 0.08);
+            box-shadow: 0 0 25px rgba(34, 197, 94, 0.1), inset 0 0 15px rgba(34, 197, 94, 0.05);
         }
         .matrix-text {
             color: #4ade80;
             text-shadow: 0 0 12px rgba(74, 222, 128, 0.7);
         }
 
-        /* Continuous Marquee Ticker Animation */
         @keyframes marqueeScroll {
             0% { transform: translateX(0%); }
             100% { transform: translateX(-50%); }
@@ -146,13 +116,19 @@
 
         .marquee-track:hover { animation-play-state: paused; }
         
-        /* Terminal Custom Scrollbar */
         .terminal-scroll::-webkit-scrollbar { width: 6px; }
         .terminal-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
         .terminal-scroll::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 3px; }
+
+        .chat-widget-box {
+            background: rgba(10, 15, 30, 0.95);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(59, 130, 246, 0.3);
+        }
     </style>
 </head>
-<body class="text-gray-100 font-sans antialiased min-h-screen flex flex-col justify-between">
+<body class="text-gray-100 font-sans antialiased min-h-screen flex flex-col justify-between relative">
 
     <!-- TOP FIKSIRANA MARQUEE TRAKA -->
     <div class="fixed top-0 left-0 right-0 z-50 bg-gray-950/90 border-b border-blue-500/30 backdrop-blur-md py-1 overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
@@ -186,46 +162,55 @@
                 </div>
 
                 <div class="hidden sm:flex items-center gap-6 text-xs font-mono text-gray-300 border border-white/15 px-4 py-1.5 rounded-full bg-white/5 digital-font">
-                    <span class="flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span> SYSTEM ONLINE</span>
+                    <span id="userStatusBadge" class="flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span> SYSTEM ONLINE</span>
                     <span class="text-gray-600">|</span>
                     <span>v2026.10_ARCH</span>
                 </div>
 
-                <div class="flex items-center gap-3">
-                    <button onclick="scrollToCalc()" class="hidden md:inline-block border border-blue-500/40 text-blue-300 hover:bg-blue-500/20 rounded-xl px-4 py-2 text-xs font-bold uppercase digital-font transition">
-                        📊 Kalkulator
+                <div class="flex items-center gap-2.5">
+                    <button onclick="toggleAuthModal()" id="authNavBtn" class="border border-blue-500/40 text-blue-300 hover:bg-blue-500/20 rounded-xl px-3 py-1.5 text-xs font-bold uppercase digital-font transition">
+                        👤 Prijava / Registracija
                     </button>
-                    <button onclick="openModal()" class="btn-robo rounded-xl px-5 py-2 text-xs font-bold uppercase tracking-wider text-white robo-font">
-                        ZATRAŽI PONUDU
+                    <button onclick="toggleAdminPanel()" class="border border-purple-500/40 text-purple-300 hover:bg-purple-500/20 rounded-xl px-3 py-1.5 text-xs font-bold uppercase digital-font transition">
+                        🔑 Admin
+                    </button>
+                    <button onclick="openModal()" class="btn-robo rounded-xl px-4 py-2 text-xs font-bold uppercase tracking-wider text-white robo-font hidden sm:block">
+                        PONUDA
                     </button>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- MATRIX DIGITALNI SAT WIDGET -->
-    <div class="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8 relative z-10 w-full">
-        <div class="matrix-clock-box rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <div class="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-ping"></div>
-                <span class="text-xs uppercase tracking-widest text-emerald-400 font-bold robo-font">NEURAL CHRONO // SYSTEM TIME</span>
-            </div>
-            
-            <div class="flex items-center gap-6">
-                <!-- Datum -->
-                <div id="matrixDate" class="text-xs tracking-wider text-emerald-500/80 digital-font font-mono">
-                    --.--.2026.
+    <!-- TERMINAL CHRONO SYSTEM CLOCK -->
+    <div class="mx-auto max-w-7xl px-4 pt-5 sm:px-6 lg:px-8 relative z-10 w-full">
+        <div class="matrix-clock-box rounded-2xl p-3 sm:p-3.5 flex flex-col md:flex-row items-center justify-between gap-3 font-mono text-xs digital-font">
+            <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
+                <div class="flex items-center gap-2.5">
+                    <span class="flex h-2 w-2 relative">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    <span class="text-emerald-400 font-bold tracking-wider">[SYS_CLK]</span>
                 </div>
-                <!-- Vrijeme u Matrix stilu -->
-                <div id="matrixClock" class="text-xl sm:text-2xl font-black tracking-widest matrix-text digital-font">
-                    00:00:00
+                <span class="text-gray-600 hidden sm:inline">//</span>
+                <span id="terminalLogClock" class="text-gray-400 text-[11px] truncate max-w-[280px] sm:max-w-md">INITIALIZING KERNEL TICK...</span>
+            </div>
+
+            <div class="flex items-center gap-3 bg-emerald-950/40 border border-emerald-500/20 px-3 py-1.5 rounded-xl w-full md:w-auto justify-center">
+                <span id="matrixDate" class="text-[11px] text-emerald-500/80 tracking-widest">2026-10-19</span>
+                <span class="text-gray-600">|</span>
+                <div class="flex items-center gap-1">
+                    <span class="text-emerald-400 font-bold">UTC:</span>
+                    <span id="matrixClock" class="text-sm sm:text-base font-black tracking-widest matrix-text">00:00:00.00</span>
+                    <span class="animate-pulse text-emerald-400 font-bold">_</span>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- HERO SEKCIJA -->
-    <section class="relative py-12 px-4 text-center overflow-hidden">
+    <section class="relative py-10 px-4 text-center overflow-hidden">
         <div class="mx-auto max-w-5xl relative z-10">
             <div class="inline-flex items-center gap-2 rounded-full border border-blue-500/40 bg-blue-500/10 px-5 py-2 text-xs font-mono text-blue-300 mb-6 cyber-badge digital-font">
                 <span class="animate-ping h-2 w-2 rounded-full bg-blue-400"></span>
@@ -259,8 +244,6 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            
-            <!-- 1. AI MODELI -->
             <div onclick="openModal('ai_models')" class="featured-ai-card rounded-3xl p-8 cursor-pointer flex flex-col justify-between md:col-span-2 lg:col-span-3">
                 <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                     <div class="flex items-start gap-5">
@@ -286,7 +269,7 @@
                 </div>
             </div>
 
-            <!-- 2. SMART HOME -->
+            <!-- SMART HOME -->
             <div onclick="openModal('smart_home')" class="robo-card rounded-3xl p-7 cursor-pointer flex flex-col justify-between">
                 <div>
                     <div class="flex items-center justify-between mb-6">
@@ -306,7 +289,7 @@
                 </div>
             </div>
 
-            <!-- 3. EVIDENCIJA RADNOG VREMENA -->
+            <!-- EVIDENCIJA RADNOG VREMENA -->
             <div onclick="openModal('time_tracking')" class="robo-card rounded-3xl p-7 cursor-pointer flex flex-col justify-between">
                 <div>
                     <div class="flex items-center justify-between mb-6">
@@ -326,7 +309,7 @@
                 </div>
             </div>
 
-            <!-- 4. BACKUP SERVERI -->
+            <!-- BACKUP SERVERI -->
             <div onclick="openModal('backup')" class="robo-card rounded-3xl p-7 cursor-pointer flex flex-col justify-between">
                 <div>
                     <div class="flex items-center justify-between mb-6">
@@ -346,7 +329,7 @@
                 </div>
             </div>
 
-            <!-- 5. WEB STRANICE -->
+            <!-- WEB STRANICE -->
             <div onclick="openModal('web_shop')" class="robo-card rounded-3xl p-7 cursor-pointer flex flex-col justify-between">
                 <div>
                     <div class="flex items-center justify-between mb-6">
@@ -366,7 +349,7 @@
                 </div>
             </div>
 
-            <!-- 6. MOBILNE APLIKACIJE -->
+            <!-- MOBILNE APLIKACIJE -->
             <div onclick="openModal('mobile_app')" class="robo-card rounded-3xl p-7 cursor-pointer flex flex-col justify-between">
                 <div>
                     <div class="flex items-center justify-between mb-6">
@@ -386,7 +369,7 @@
                 </div>
             </div>
 
-            <!-- 7. IT MREŽE -->
+            <!-- IT MREŽE -->
             <div onclick="openModal('network')" class="robo-card rounded-3xl p-7 cursor-pointer flex flex-col justify-between">
                 <div>
                     <div class="flex items-center justify-between mb-6">
@@ -405,28 +388,10 @@
                     <span class="transition-transform group-hover:translate-x-2">→</span>
                 </div>
             </div>
-
         </div>
     </main>
 
-    <!-- TEHNOLOŠKA INFRASTRUKTURA & STACK -->
-    <section class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 mb-16 w-full">
-        <div class="robo-card rounded-3xl p-8 border border-blue-500/30">
-            <h3 class="text-xl font-bold text-white robo-font mb-2">// POGON I TEHNOLOGIJE</h3>
-            <p class="text-xs text-gray-400 digital-font mb-6">Provjerene platforme na kojima gradimo vaša rješenja</p>
-            
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 text-center font-mono text-xs digital-font">
-                <div class="p-3 rounded-xl bg-gray-900/80 border border-gray-800 text-blue-400">🐋 Docker / Containers</div>
-                <div class="p-3 rounded-xl bg-gray-900/80 border border-gray-800 text-emerald-400">🐧 Linux Kernel / Arch</div>
-                <div class="p-3 rounded-xl bg-gray-900/80 border border-gray-800 text-purple-400">🧠 LLM / PyTorch</div>
-                <div class="p-3 rounded-xl bg-gray-900/80 border border-gray-800 text-amber-400">🔒 Cloudflare / Tunnels</div>
-                <div class="p-3 rounded-xl bg-gray-900/80 border border-gray-800 text-cyan-400">📡 Tailscale Mesh</div>
-                <div class="p-3 rounded-xl bg-gray-900/80 border border-gray-800 text-pink-400">🐍 Python Enterprise</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- INTERAKTIVNI KALKULATOR TROŠKOVA -->
+    <!-- KALKULATOR -->
     <section id="calcSection" class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 mb-16 w-full">
         <div class="robo-card rounded-3xl p-8 border border-indigo-500/30">
             <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
@@ -485,15 +450,141 @@
             </div>
 
             <div id="terminalLog" class="h-32 overflow-y-auto terminal-scroll text-gray-300 space-y-1 mb-2">
-                <p class="text-gray-500">// NEXUS CLI v2026. Ukucajte <span class="text-emerald-400">'help'</span> za listu dostupnih komandi.</p>
+                <p class="text-gray-500">// NEXUS CLI v2026. Ukucajte <span class="text-emerald-400">'help'</span>, <span class="text-blue-400">'login'</span> ili <span class="text-purple-400">'admin'</span>.</p>
             </div>
 
             <form onsubmit="handleTerminalSubmit(event)" class="flex items-center gap-2">
                 <span class="text-emerald-400 font-bold">root@nexus:~#</span>
-                <input type="text" id="terminalInput" autocomplete="off" placeholder="Unesite komandu (npr. help, status, usluge, kontakt)..." class="flex-1 bg-transparent text-emerald-300 focus:outline-none digital-font text-xs">
+                <input type="text" id="terminalInput" autocomplete="off" placeholder="Unesite komandu (help, login, register, admin, clear)..." class="flex-1 bg-transparent text-emerald-300 focus:outline-none digital-font text-xs">
             </form>
         </div>
     </section>
+
+    <!-- AUTH MODAL (PRIJAVA I REGISTRACIJA) -->
+    <div id="authModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4">
+        <div class="w-full max-w-md rounded-3xl bg-gray-950 border border-blue-500/50 p-6 sm:p-8 shadow-2xl relative digital-font">
+            <button onclick="toggleAuthModal()" class="absolute right-5 top-5 text-gray-400 hover:text-white text-xl font-mono">✕</button>
+
+            <!-- Tab dugmad (Prijava / Registracija) -->
+            <div class="flex rounded-xl bg-gray-900 p-1 border border-white/10 mb-6">
+                <button onclick="switchAuthTab('login')" id="tabLoginBtn" class="flex-1 py-2 text-xs font-bold rounded-lg bg-blue-600 text-white robo-font transition">PRIJAVA</button>
+                <button onclick="switchAuthTab('register')" id="tabRegBtn" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 hover:text-white robo-font transition">REGISTRACIJA</button>
+            </div>
+
+            <!-- FORMA ZA PRIJAVU -->
+            <form id="loginForm" onsubmit="handleLoginSubmit(event)" class="space-y-4">
+                <h3 class="text-base font-bold text-blue-400 robo-font mb-2">// KORISNIČKI LOGIN</h3>
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-300 mb-1">EMAIL ADRESA</label>
+                    <input type="email" id="loginEmail" required placeholder="korisnik@domena.com" class="w-full rounded-xl bg-gray-900 border border-gray-700 px-4 py-2.5 text-xs text-white focus:border-blue-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-300 mb-1">LOZINKA</label>
+                    <input type="password" id="loginPassword" required placeholder="********" class="w-full rounded-xl bg-gray-900 border border-gray-700 px-4 py-2.5 text-xs text-white focus:border-blue-500 focus:outline-none">
+                </div>
+                <button type="submit" class="w-full btn-robo py-3 rounded-xl text-xs font-bold text-white robo-font mt-2">PRIJAVI SE NA PORTAL</button>
+            </form>
+
+            <!-- FORMA ZA REGISTRACIJU -->
+            <form id="registerForm" onsubmit="handleRegisterSubmit(event)" class="space-y-3.5 hidden">
+                <h3 class="text-base font-bold text-emerald-400 robo-font mb-2">// NOVA REGISTRACIJA</h3>
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-300 mb-1">IME I PREZIME / FIRMA</label>
+                    <input type="text" id="regName" required placeholder="Vaše ime ili naziv" class="w-full rounded-xl bg-gray-900 border border-gray-700 px-3.5 py-2 text-xs text-white focus:border-emerald-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-300 mb-1">EMAIL ADRESA</label>
+                    <input type="email" id="regEmail" required placeholder="email@domena.com" class="w-full rounded-xl bg-gray-900 border border-gray-700 px-3.5 py-2 text-xs text-white focus:border-emerald-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-300 mb-1">KREIRAJ LOZINKU</label>
+                    <input type="password" id="regPassword" required placeholder="********" class="w-full rounded-xl bg-gray-900 border border-gray-700 px-3.5 py-2 text-xs text-white focus:border-emerald-500 focus:outline-none">
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 py-3 rounded-xl text-xs font-bold text-white robo-font mt-2 shadow-[0_0_20px_rgba(16,185,129,0.4)] transition">KREIRAJ KORISNIČKI RAČUN</button>
+            </form>
+
+            <div id="authStatusMsg" class="mt-4 text-center text-[11px] text-gray-400"></div>
+        </div>
+    </div>
+
+    <!-- FLOATING CYBER CHAT WIDGET -->
+    <div class="fixed bottom-6 right-6 z-50">
+        <button id="chatToggleBtn" onclick="toggleChatWidget()" class="btn-robo rounded-full w-14 h-14 flex items-center justify-center shadow-2xl text-white relative hover:scale-110 transition-transform">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+            <span class="absolute -top-1 -right-1 h-3.5 w-3.5 bg-emerald-400 rounded-full border-2 border-gray-900 animate-pulse"></span>
+        </button>
+
+        <div id="chatWidget" class="hidden chat-widget-box w-80 sm:w-96 rounded-3xl p-4 flex-col justify-between absolute bottom-16 right-0 h-[450px]">
+            <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                <div class="flex items-center gap-2">
+                    <div class="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse"></div>
+                    <div>
+                        <h4 class="text-xs font-bold text-white robo-font">NEXUS LIVE SUPPORT</h4>
+                        <span id="sessionDisplay" class="text-[9px] text-gray-400 digital-font">ID: SEC-3920</span>
+                    </div>
+                </div>
+                <button onclick="toggleChatWidget()" class="text-gray-400 hover:text-white text-xs font-mono">✕</button>
+            </div>
+
+            <div id="chatMessages" class="flex-1 overflow-y-auto my-3 space-y-2.5 text-xs digital-font terminal-scroll pr-1 flex flex-col">
+                <div class="bg-blue-950/60 border border-blue-500/30 p-2.5 rounded-2xl max-w-[85%] text-gray-200">
+                    <span class="text-[9px] text-blue-400 block mb-0.5">NEXUS ADMIN // SYSTEM</span>
+                    Pozdrav! Kako vam možemo pomoći oko IT infrastrukture ili AI modela?
+                </div>
+            </div>
+
+            <form onsubmit="sendUserChatMessage(event)" class="flex items-center gap-2 pt-2 border-t border-white/10">
+                <input type="text" id="chatInput" placeholder="Napišite poruku..." autocomplete="off" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:border-blue-500 focus:outline-none digital-font">
+                <button type="submit" class="btn-robo px-3 py-2 rounded-xl text-xs font-bold text-white robo-font">➔</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ADMIN CONSOLE MODAL -->
+    <div id="adminModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4">
+        <div class="w-full max-w-3xl rounded-3xl bg-gray-950 border border-purple-500/50 p-6 shadow-2xl relative">
+            <button onclick="toggleAdminPanel()" class="absolute right-5 top-5 text-gray-400 hover:text-white text-xl font-mono">✕</button>
+            
+            <h3 class="text-lg font-bold text-purple-400 robo-font mb-1">// ADMIN TERMINAL CONSOLE</h3>
+            <p class="text-xs text-gray-400 digital-font mb-4">Upravljanje aktivnim chat sesijama klijenata u realnom vremenu</p>
+
+            <div id="adminAuth" class="space-y-4 py-8 text-center max-w-sm mx-auto">
+                <label class="block text-xs text-gray-300 digital-font">UNESITE ADMIN PIN KOD *</label>
+                <input type="password" id="adminPinInput" placeholder="****" class="w-full text-center tracking-widest text-lg rounded-xl bg-gray-900 border border-gray-700 px-4 py-3 text-white focus:border-purple-500 focus:outline-none digital-font">
+                <button onclick="verifyAdminPin()" class="btn-ai w-full py-3 rounded-xl text-xs font-bold text-white robo-font">VERIFIKUJ PRISTUP</button>
+            </div>
+
+            <div id="adminDashboard" class="hidden grid grid-cols-1 md:grid-cols-3 gap-4 h-[400px]">
+                <div class="bg-gray-900/90 rounded-2xl p-3 border border-gray-800 flex flex-col">
+                    <span class="text-[10px] font-bold text-purple-400 digital-font mb-2">AKTIVNE SESIJE:</span>
+                    <div id="adminSessionsList" class="flex-1 overflow-y-auto space-y-2 terminal-scroll">
+                        <div onclick="selectSession('SEC-3920')" class="p-2 rounded-xl bg-purple-900/40 border border-purple-500/50 text-xs digital-font cursor-pointer hover:bg-purple-800/40 mb-2">
+                            <span class="block text-white font-bold">Klijent SEC-3920</span>
+                            <span class="text-[9px] text-emerald-400">● Mrežni klijent uživo</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="md:col-span-2 bg-gray-900/90 rounded-2xl p-3 border border-gray-800 flex flex-col justify-between">
+                    <div class="border-b border-gray-800 pb-2 flex items-center justify-between">
+                        <span id="activeAdminSessionTitle" class="text-xs font-bold text-emerald-400 digital-font">SESIJA: SEC-3920</span>
+                        <span class="text-[9px] text-emerald-400 digital-font">● REALTIME CONNECTED</span>
+                    </div>
+
+                    <div id="adminChatLog" class="flex-1 overflow-y-auto my-2 space-y-2 text-xs digital-font terminal-scroll pr-1 flex flex-col">
+                        <div class="bg-blue-950/60 p-2 rounded-xl border border-blue-500/30 text-gray-200">
+                            <span class="text-[9px] text-blue-400 block">SEC-3920:</span> Klijent je pokrenuo chat sesiju na portalu.
+                        </div>
+                    </div>
+
+                    <form onsubmit="sendAdminReply(event)" class="flex gap-2 pt-2 border-t border-gray-800">
+                        <input type="text" id="adminReplyInput" placeholder="Odgovori klijentu kao Admin..." autocomplete="off" class="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:border-purple-500 focus:outline-none digital-font">
+                        <button type="submit" class="btn-ai px-4 py-2 rounded-xl text-xs font-bold text-white robo-font">POŠALJI</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- MODAL FORMA ZA UPIT -->
     <div id="requestModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 overflow-y-auto">
@@ -552,119 +643,197 @@
         <p>© 2026 NEXUS IT SOLUTIONS // Enterprise Robo-Tech Systems Architecture.</p>
     </footer>
 
-    <!-- SKRIPTE I LOGIKA -->
+    <!-- SKRIPTE -->
     <script>
-        // Inicijalizacija EmailJS servisa
-        (function(){
-            emailjs.init("YOUR_PUBLIC_KEY");
-        })();
+        let currentSessionId = localStorage.getItem('nexus_session_id') || ('SEC-' + Math.floor(1000 + Math.random() * 9000));
+        localStorage.setItem('nexus_session_id', currentSessionId);
+        document.getElementById('sessionDisplay').innerText = `ID: ${currentSessionId}`;
 
-        // Matrix Sat Update Funkcija
+        // Provjera ulogovanog korisnika pri učitavanju
+        window.addEventListener('DOMContentLoaded', () => {
+            const loggedUser = localStorage.getItem('nexus_logged_user');
+            if (loggedUser) {
+                document.getElementById('authNavBtn').innerText = `👤 ${loggedUser} (Odjava)`;
+                document.getElementById('userStatusBadge').innerHTML = `<span class="h-2 w-2 rounded-full bg-blue-400 animate-ping"></span> USER: ${loggedUser}`;
+            }
+        });
+
+        function toggleAuthModal() {
+            const loggedUser = localStorage.getItem('nexus_logged_user');
+            if (loggedUser) {
+                if (confirm(`Želite li da se odjavite (${loggedUser})?`)) {
+                    localStorage.removeItem('nexus_logged_user');
+                    location.reload();
+                }
+                return;
+            }
+            document.getElementById('authModal').classList.toggle('hidden');
+        }
+
+        function switchAuthTab(tab) {
+            const loginForm = document.getElementById('loginForm');
+            const regForm = document.getElementById('registerForm');
+            const loginBtn = document.getElementById('tabLoginBtn');
+            const regBtn = document.getElementById('tabRegBtn');
+            const statusMsg = document.getElementById('authStatusMsg');
+            statusMsg.innerText = '';
+
+            if (tab === 'login') {
+                loginForm.classList.remove('hidden');
+                regForm.classList.add('hidden');
+                loginBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-blue-600 text-white robo-font transition";
+                regBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 hover:text-white robo-font transition";
+            } else {
+                loginForm.classList.add('hidden');
+                regForm.classList.remove('hidden');
+                regBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-emerald-600 text-white robo-font transition";
+                loginBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 hover:text-white robo-font transition";
+            }
+        }
+
+        function handleRegisterSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const pass = document.getElementById('regPassword').value;
+
+            // Snimanje u localStorage
+            localStorage.setItem('nexus_reg_name', name);
+            localStorage.setItem('nexus_reg_email', email);
+            localStorage.setItem('nexus_reg_pass', pass);
+
+            document.getElementById('authStatusMsg').innerHTML = "<span class='text-emerald-400'>Račun uspješno kreiran! Možete se prijaviti.</span>";
+            setTimeout(() => switchAuthTab('login'), 1200);
+        }
+
+        function handleLoginSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim();
+            const pass = document.getElementById('loginPassword').value;
+
+            const savedEmail = localStorage.getItem('nexus_reg_email');
+            const savedPass = localStorage.getItem('nexus_reg_pass');
+            const savedName = localStorage.getItem('nexus_reg_name') || email.split('@')[0];
+
+            if ((savedEmail && email === savedEmail && pass === savedPass) || (email === 'admin@nexus.com' && pass === '1337')) {
+                localStorage.setItem('nexus_logged_user', savedName);
+                document.getElementById('authStatusMsg').innerHTML = "<span class='text-blue-400'>Prijava uspješna! Učitavanje...</span>";
+                setTimeout(() => {
+                    toggleAuthModal();
+                    location.reload();
+                }, 1000);
+            } else {
+                document.getElementById('authStatusMsg').innerHTML = "<span class='text-red-400'>Greška: Neispravan email ili lozinka!</span>";
+            }
+        }
+
+        function toggleChatWidget() {
+            const widget = document.getElementById('chatWidget');
+            widget.classList.toggle('hidden');
+            widget.classList.toggle('flex');
+        }
+
+        function sendUserChatMessage(e) {
+            e.preventDefault();
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const chatContainer = document.getElementById('chatMessages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = "bg-blue-600/30 border border-blue-400/30 p-2.5 rounded-2xl max-w-[85%] text-gray-100 ml-auto self-end text-right";
+            msgDiv.innerHTML = `<span class="text-[9px] text-blue-300 block mb-0.5">VI (${currentSessionId})</span>${text}`;
+            chatContainer.appendChild(msgDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            const adminLog = document.getElementById('adminChatLog');
+            if (adminLog) {
+                const aDiv = document.createElement('div');
+                aDiv.className = "bg-blue-950/60 p-2 rounded-xl border border-blue-500/30 text-gray-200";
+                aDiv.innerHTML = `<span class="text-[9px] text-blue-400 block">${currentSessionId}:</span> ${text}`;
+                adminLog.appendChild(aDiv);
+                adminLog.scrollTop = adminLog.scrollHeight;
+            }
+
+            input.value = '';
+        }
+
+        function toggleAdminPanel() {
+            document.getElementById('adminModal').classList.toggle('hidden');
+        }
+
+        function verifyAdminPin() {
+            const pin = document.getElementById('adminPinInput').value;
+            if (pin === '1337' || pin === '0000') {
+                document.getElementById('adminAuth').classList.add('hidden');
+                document.getElementById('adminDashboard').classList.remove('hidden');
+                document.getElementById('adminDashboard').classList.add('grid');
+            } else {
+                alert('Pristup Odbijen: Neispravan Admin PIN kod!');
+            }
+        }
+
+        function sendAdminReply(e) {
+            e.preventDefault();
+            const input = document.getElementById('adminReplyInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const adminLog = document.getElementById('adminChatLog');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = "bg-purple-900/40 border border-purple-500/40 p-2 rounded-xl text-purple-200";
+            msgDiv.innerHTML = `<span class="text-[9px] text-purple-400 block">ADMIN RESPOND:</span>${text}`;
+            adminLog.appendChild(msgDiv);
+            adminLog.scrollTop = adminLog.scrollHeight;
+
+            const userChat = document.getElementById('chatMessages');
+            const uMsg = document.createElement('div');
+            uMsg.className = "bg-purple-950/70 border border-purple-500/40 p-2.5 rounded-2xl max-w-[85%] text-purple-200 self-start";
+            uMsg.innerHTML = `<span class="text-[9px] text-purple-400 block mb-0.5">NEXUS ADMIN</span>${text}`;
+            userChat.appendChild(uMsg);
+            userChat.scrollTop = userChat.scrollHeight;
+
+            input.value = '';
+        }
+
+        // Terminal Chrono Sat sa rotirajućim logovima
+        const sysLogs = [
+            "CPU_FREQ: 4.80GHz // TEMP: 38°C",
+            "MEM_ALLOC: 4.2GB / 32GB [OK]",
+            "NET_LATENCY: 12ms // PACKET_LOSS: 0%",
+            "ENCRYPTION: AES-256-GCM ACTIVE",
+            "DAEMON: sync_time.service [RUNNING]",
+            "SECURITY_LEVEL: MAXIMUM // FIREWALL: ON"
+        ];
+        let logIndex = 0;
+
         function updateMatrixClock() {
             const now = new Date();
-            
-            // Formatiranje vremena HH:MM:SS
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const seconds = String(now.getSeconds()).padStart(2, '0');
-            document.getElementById('matrixClock').innerText = `${hours}:${minutes}:${seconds}`;
+            const ms = String(Math.floor(now.getMilliseconds() / 10)).padStart(2, '0');
 
-            // Formatiranje datuma DD.MM.YYYY.
-            const day = String(now.getDate()).padStart(2, '0');
-            const month = String(now.getMonth() + 1).padStart(2, '0');
+            document.getElementById('matrixClock').innerText = `${hours}:${minutes}:${seconds}.${ms}`;
+
             const year = now.getFullYear();
-            document.getElementById('matrixDate').innerText = `${day}.${month}.${year}.`;
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            document.getElementById('matrixDate').innerText = `${year}-${month}-${day}`;
+
+            if (now.getMilliseconds() < 30) {
+                logIndex = (logIndex + 1) % sysLogs.length;
+                document.getElementById('terminalLogClock').innerText = sysLogs[logIndex];
+            }
         }
-        setInterval(updateMatrixClock, 1000);
+        setInterval(updateMatrixClock, 30);
         updateMatrixClock();
 
-        // Modal otvaranje/zatvaranje
-        function openModal(serviceValue) {
-            const select = document.getElementById('serviceSelect');
-            if (serviceValue && select) {
-                select.value = serviceValue;
-            }
-            const modal = document.getElementById('requestModal');
-            if (modal) modal.classList.remove('hidden');
-        }
-
-        function closeModal() {
-            const modal = document.getElementById('requestModal');
-            if (modal) modal.classList.add('hidden');
-        }
-
-        // Kalkulator logika
-        function calculateEstimate() {
-            const service = document.getElementById('calcService').value;
-            const scale = document.getElementById('calcScale').value;
-            const resultDiv = document.getElementById('calcResult');
-
-            let base = "300 - 600 KM";
-
-            if (service === 'ai') {
-                if (scale === 'small') base = "800 - 1.500 KM";
-                else if (scale === 'medium') base = "1.500 - 3.000 KM";
-                else base = "3.000+ KM (Custom Enterprise)";
-            } else if (service === 'smart') {
-                if (scale === 'small') base = "500 - 1.200 KM";
-                else if (scale === 'medium') base = "1.200 - 2.500 KM";
-                else base = "2.500+ KM";
-            } else if (scale === 'small' && service === 'time') {
-                base = "400 - 800 KM";
-            } else if (service === 'time') {
-                if (scale === 'medium') base = "800 - 1.800 KM";
-                else base = "1.800+ KM";
-            } else if (service === 'backup') {
-                if (scale === 'small') base = "350 - 700 KM";
-                else if (scale === 'medium') base = "700 - 1.500 KM";
-                else base = "1.500+ KM";
-            } else if (service === 'web') {
-                if (scale === 'small') base = "400 - 800 KM";
-                else if (scale === 'medium') base = "800 - 1.600 KM";
-                else base = "1.600+ KM";
-            }
-
-            resultDiv.innerText = base;
-        }
-
-        function scrollToCalc() {
-            document.getElementById('calcSection').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function applyCalcToForm() {
-            const service = document.getElementById('calcService').value;
-            const map = {
-                'ai': 'ai_models',
-                'smart': 'smart_home',
-                'time': 'time_tracking',
-                'backup': 'backup',
-                'web': 'web_shop'
-            };
-            openModal(map[service] || 'ai_models');
-        }
-
-        // Rukovanje slanjem forme
-        function handleFormSubmit(e) {
-            e.preventDefault();
-            const btn = document.getElementById('submitBtn');
-            btn.innerText = "SLANJE ENKRIPTOVANOG ZAHTJEVA...";
-            btn.disabled = true;
-
-            setTimeout(() => {
-                alert('Vaš zahtjev je uspješno zaprimljen! Naš IT tim će vas kontaktirati na navedeni e-mail/telefon.');
-                btn.innerText = "POŠALJI ZAHTJEV";
-                btn.disabled = false;
-                closeModal();
-            }, 1200);
-        }
-
-        // Terminal logika
         function handleTerminalSubmit(e) {
             e.preventDefault();
             const input = document.getElementById('terminalInput');
             const log = document.getElementById('terminalLog');
             const cmd = input.value.trim().toLowerCase();
-
             if (!cmd) return;
 
             const pUser = document.createElement('p');
@@ -677,23 +846,32 @@
 
             switch (cmd) {
                 case 'help':
-                    pResp.innerText = "Dostupne komande: 'status', 'usluge', 'kontakt', 'clear'";
+                    pResp.innerText = "Dostupne komande: 'status', 'usluge', 'login', 'register', 'admin', 'kontakt', 'clear'";
+                    break;
+                case 'login':
+                case 'register':
+                    pResp.innerHTML = "<span class='text-blue-400'>OTVARANJE KORISNIČKOG PORTALA...</span>";
+                    toggleAuthModal();
+                    break;
+                case 'admin':
+                    pResp.innerHTML = "<span class='text-purple-400'>POKRETANJE ADMIN CONSOLE MODULA...</span>";
+                    toggleAdminPanel();
                     break;
                 case 'status':
-                    pResp.innerHTML = "<span class='text-green-400'>ALL SYSTEMS OPERATIONAL</span> | CPU: 12% | RAM: 4.2GB | Tunnel: Active";
+                    pResp.innerHTML = "<span class='text-green-400'>ALL SYSTEMS OPERATIONAL</span> | Local Dev Server";
                     break;
                 case 'usluge':
-                    pResp.innerText = "Usluge: AI Modeli, Smart Home, Evidencija Vremena, Backup Serveri, Web/Mobile Apps, Mreže.";
+                    pResp.innerText = "Usluge: AI Modeli, Smart Home, Evidencija Vremena, Backup Serveri, Web/Mobile Apps.";
                     break;
                 case 'kontakt':
-                    pResp.innerText = "Telefon: 066363660 | Mail: bmwsn1p3r@gmail.com";
+                    pResp.innerText = "MOB: 066363660 | MAIL: bmwsn1p3r@gmail.com";
                     break;
                 case 'clear':
                     log.innerHTML = "";
                     input.value = "";
                     return;
                 default:
-                    pResp.innerText = `Komanda '${cmd}' nije prepoznata. Ukucajte 'help' za pomoć.`;
+                    pResp.innerText = `Komanda '${cmd}' nije prepoznata. Ukucajte 'help'.`;
             }
 
             log.appendChild(pResp);
@@ -701,10 +879,49 @@
             input.value = "";
         }
 
-        window.onclick = function(event) {
-            const modal = document.getElementById('requestModal');
-            if (event.target === modal) closeModal();
+        function openModal(serviceValue) {
+            const select = document.getElementById('serviceSelect');
+            if (serviceValue && select) select.value = serviceValue;
+            document.getElementById('requestModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('requestModal').classList.add('hidden');
+        }
+
+        function calculateEstimate() {
+            const service = document.getElementById('calcService').value;
+            const scale = document.getElementById('calcScale').value;
+            const resultDiv = document.getElementById('calcResult');
+            let base = "300 - 600 KM";
+
+            if (service === 'ai') {
+                if (scale === 'small') base = "800 - 1.500 KM";
+                else if (scale === 'medium') base = "1.500 - 3.000 KM";
+                else base = "3.000+ KM";
+            } else if (service === 'smart') {
+                if (scale === 'small') base = "500 - 1.200 KM";
+                else if (scale === 'medium') base = "1.200 - 2.500 KM";
+                else base = "2.500+ KM";
+            }
+            resultDiv.innerText = base;
+        }
+
+        function scrollToCalc() {
+            document.getElementById('calcSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function applyCalcToForm() {
+            const service = document.getElementById('calcService').value;
+            openModal(service === 'ai' ? 'ai_models' : 'smart_home');
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            alert('Vaš zahtjev je zaprimljen! Naš IT tim će vas kontaktirati.');
+            closeModal();
         }
     </script>
 </body>
+    
 </html>
