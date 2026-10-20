@@ -851,3 +851,174 @@
             // STANDARDNO KORISNIČKO LOGOVANJE
             else if ((savedEmail && email === savedEmail && pass === savedPass)) {
                 localStorage.setItem('nexus_logged_user', savedName);
+                localStorage.setItem('nexus_is_admin', 'false');
+                document.getElementById('authStatusMsg').innerHTML = "<span class='text-blue-400'>Prijava uspješna! Učitavanje...</span>";
+                setTimeout(() => {
+                    toggleAuthModal();
+                    location.reload();
+                }, 1000);
+            } else {
+                document.getElementById('authStatusMsg').innerHTML = "<span class='text-red-400'>Greška: Neispravan email ili lozinka!</span>";
+            }
+        }
+
+        function toggleChatWidget() {
+            const widget = document.getElementById('chatWidget');
+            widget.classList.toggle('hidden');
+            widget.classList.toggle('flex');
+        }
+
+        function toggleAdminPanel() {
+            const isAdmin = localStorage.getItem('nexus_is_admin');
+            if (isAdmin === 'true') {
+                // Ako je ulogovan kao admin, direktno mu otvori konzolu bez ponovnog traženja PIN-a!
+                document.getElementById('adminModal').classList.remove('hidden');
+                document.getElementById('adminAuth').classList.add('hidden');
+                document.getElementById('adminDashboard').classList.remove('hidden');
+                document.getElementById('adminDashboard').classList.add('grid');
+                selectSession(currentSessionId);
+            } else {
+                document.getElementById('adminModal').classList.toggle('hidden');
+            }
+        }
+
+        function verifyAdminPin() {
+            const pin = document.getElementById('adminPinInput').value;
+            if (pin === '1337' || pin === '0000') {
+                document.getElementById('adminAuth').classList.add('hidden');
+                document.getElementById('adminDashboard').classList.remove('hidden');
+                document.getElementById('adminDashboard').classList.add('grid');
+                selectSession(currentSessionId);
+            } else {
+                alert('Pristup Odbijen: Neispravan Admin PIN kod!');
+            }
+        }
+
+        // Terminal Chrono Sat sa rotirajućim logovima
+        const sysLogs = [
+            "CPU_FREQ: 4.80GHz // TEMP: 38°C",
+            "MEM_ALLOC: 4.2GB / 32GB [OK]",
+            "NET_LATENCY: 12ms // PACKET_LOSS: 0%",
+            "ENCRYPTION: AES-256-GCM ACTIVE",
+            "DAEMON: sync_time.service [RUNNING]",
+            "FIREBASE FIRESTORE: CONNECTED"
+        ];
+        let logIndex = 0;
+
+        function updateMatrixClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const ms = String(Math.floor(now.getMilliseconds() / 10)).padStart(2, '0');
+
+            document.getElementById('matrixClock').innerText = `${hours}:${minutes}:${seconds}.${ms}`;
+
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            document.getElementById('matrixDate').innerText = `${year}-${month}-${day}`;
+
+            if (now.getMilliseconds() < 30) {
+                logIndex = (logIndex + 1) % sysLogs.length;
+                document.getElementById('terminalLogClock').innerText = sysLogs[logIndex];
+            }
+        }
+        setInterval(updateMatrixClock, 30);
+        updateMatrixClock();
+
+        function handleTerminalSubmit(e) {
+            e.preventDefault();
+            const input = document.getElementById('terminalInput');
+            const log = document.getElementById('terminalLog');
+            const cmd = input.value.trim().toLowerCase();
+            if (!cmd) return;
+
+            const pUser = document.createElement('p');
+            pUser.className = "text-emerald-400";
+            pUser.innerText = `root@nexus:~# ${cmd}`;
+            log.appendChild(pUser);
+
+            const pResp = document.createElement('p');
+            pResp.className = "text-gray-300 ml-2";
+
+            switch (cmd) {
+                case 'help':
+                    pResp.innerText = "Dostupne komande: 'status', 'usluge', 'login', 'register', 'admin', 'kontakt', 'clear'";
+                    break;
+                case 'login':
+                case 'register':
+                    pResp.innerHTML = "<span class='text-blue-400'>OTVARANJE KORISNIČKOG PORTALA...</span>";
+                    toggleAuthModal();
+                    break;
+                case 'admin':
+                    pResp.innerHTML = "<span class='text-purple-400'>POKRETANJE ADMIN CONSOLE MODULA...</span>";
+                    toggleAdminPanel();
+                    break;
+                case 'status':
+                    pResp.innerHTML = "<span class='text-green-400'>ALL SYSTEMS OPERATIONAL</span> | Firebase Firestore Cloud Sync";
+                    break;
+                case 'usluge':
+                    pResp.innerText = "Usluge: AI Modeli, Smart Home, Evidencija Vremena, Backup Serveri, Web/Mobile Apps.";
+                    break;
+                case 'kontakt':
+                    pResp.innerText = "MOB: 066363660 | MAIL: bmwsn1p3r@gmail.com";
+                    break;
+                case 'clear':
+                    log.innerHTML = "";
+                    input.value = "";
+                    return;
+                default:
+                    pResp.innerText = `Komanda '${cmd}' nije prepoznata. Ukucajte 'help'.`;
+            }
+
+            log.appendChild(pResp);
+            log.scrollTop = log.scrollHeight;
+            input.value = "";
+        }
+
+        function openModal(serviceValue) {
+            const select = document.getElementById('serviceSelect');
+            if (serviceValue && select) select.value = serviceValue;
+            document.getElementById('requestModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('requestModal').classList.add('hidden');
+        }
+
+        function calculateEstimate() {
+            const service = document.getElementById('calcService').value;
+            const scale = document.getElementById('calcScale').value;
+            const resultDiv = document.getElementById('calcResult');
+            let base = "300 - 600 KM";
+
+            if (service === 'ai') {
+                if (scale === 'small') base = "800 - 1.500 KM";
+                else if (scale === 'medium') base = "1.500 - 3.000 KM";
+                else base = "3.000+ KM";
+            } else if (service === 'smart') {
+                if (scale === 'small') base = "500 - 1.200 KM";
+                else if (scale === 'medium') base = "1.200 - 2.500 KM";
+                else base = "2.500+ KM";
+            }
+            resultDiv.innerText = base;
+        }
+
+        function scrollToCalc() {
+            document.getElementById('calcSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function applyCalcToForm() {
+            const service = document.getElementById('calcService').value;
+            openModal(service === 'ai' ? 'ai_models' : 'smart_home');
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            alert('Vaš zahtjev je zaprimljen! Naš IT tim će vas kontaktirati.');
+            closeModal();
+        }
+    </script>
+</body>
+</html>
