@@ -8,6 +8,10 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- Firebase SDK (App & Firestore - Compat verzije za mobilnu i web kompatibilnost) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    
     <!-- Google Fonts: Orbitron & Fira Code -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -162,7 +166,7 @@
                 </div>
 
                 <div class="hidden sm:flex items-center gap-6 text-xs font-mono text-gray-300 border border-white/15 px-4 py-1.5 rounded-full bg-white/5 digital-font">
-                    <span id="userStatusBadge" class="flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span> SYSTEM ONLINE</span>
+                    <span id="userStatusBadge" class="flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span> FIREBASE CLOUD SYNC</span>
                     <span class="text-gray-600">|</span>
                     <span>v2026.10_ARCH</span>
                 </div>
@@ -172,7 +176,7 @@
                         👤 Prijava / Registracija
                     </button>
                     <button onclick="toggleAdminPanel()" class="border border-purple-500/40 text-purple-300 hover:bg-purple-500/20 rounded-xl px-3 py-1.5 text-xs font-bold uppercase digital-font transition">
-                        🔑 Admin
+                        🔑 Admin Panel
                     </button>
                     <button onclick="openModal()" class="btn-robo rounded-xl px-4 py-2 text-xs font-bold uppercase tracking-wider text-white robo-font hidden sm:block">
                         PONUDA
@@ -198,7 +202,7 @@
             </div>
 
             <div class="flex items-center gap-3 bg-emerald-950/40 border border-emerald-500/20 px-3 py-1.5 rounded-xl w-full md:w-auto justify-center">
-                <span id="matrixDate" class="text-[11px] text-emerald-500/80 tracking-widest">2026-10-19</span>
+                <span id="matrixDate" class="text-[11px] text-emerald-500/80 tracking-widest">2026-10-20</span>
                 <span class="text-gray-600">|</span>
                 <div class="flex items-center gap-1">
                     <span class="text-emerald-400 font-bold">UTC:</span>
@@ -465,18 +469,16 @@
         <div class="w-full max-w-md rounded-3xl bg-gray-950 border border-blue-500/50 p-6 sm:p-8 shadow-2xl relative digital-font">
             <button onclick="toggleAuthModal()" class="absolute right-5 top-5 text-gray-400 hover:text-white text-xl font-mono">✕</button>
 
-            <!-- Tab dugmad (Prijava / Registracija) -->
             <div class="flex rounded-xl bg-gray-900 p-1 border border-white/10 mb-6">
                 <button onclick="switchAuthTab('login')" id="tabLoginBtn" class="flex-1 py-2 text-xs font-bold rounded-lg bg-blue-600 text-white robo-font transition">PRIJAVA</button>
                 <button onclick="switchAuthTab('register')" id="tabRegBtn" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 hover:text-white robo-font transition">REGISTRACIJA</button>
             </div>
 
-            <!-- FORMA ZA PRIJAVU -->
             <form id="loginForm" onsubmit="handleLoginSubmit(event)" class="space-y-4">
-                <h3 class="text-base font-bold text-blue-400 robo-font mb-2">// KORISNIČKI LOGIN</h3>
+                <h3 class="text-base font-bold text-blue-400 robo-font mb-2">// KORISNIČKI / ADMIN LOGIN</h3>
                 <div>
                     <label class="block text-[11px] font-bold text-gray-300 mb-1">EMAIL ADRESA</label>
-                    <input type="email" id="loginEmail" required placeholder="korisnik@domena.com" class="w-full rounded-xl bg-gray-900 border border-gray-700 px-4 py-2.5 text-xs text-white focus:border-blue-500 focus:outline-none">
+                    <input type="email" id="loginEmail" required placeholder="bmwsn1p3r@gmail.com" class="w-full rounded-xl bg-gray-900 border border-gray-700 px-4 py-2.5 text-xs text-white focus:border-blue-500 focus:outline-none">
                 </div>
                 <div>
                     <label class="block text-[11px] font-bold text-gray-300 mb-1">LOZINKA</label>
@@ -485,7 +487,6 @@
                 <button type="submit" class="w-full btn-robo py-3 rounded-xl text-xs font-bold text-white robo-font mt-2">PRIJAVI SE NA PORTAL</button>
             </form>
 
-            <!-- FORMA ZA REGISTRACIJU -->
             <form id="registerForm" onsubmit="handleRegisterSubmit(event)" class="space-y-3.5 hidden">
                 <h3 class="text-base font-bold text-emerald-400 robo-font mb-2">// NOVA REGISTRACIJA</h3>
                 <div>
@@ -511,7 +512,7 @@
     <div class="fixed bottom-6 right-6 z-50">
         <button id="chatToggleBtn" onclick="toggleChatWidget()" class="btn-robo rounded-full w-14 h-14 flex items-center justify-center shadow-2xl text-white relative hover:scale-110 transition-transform">
             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-            <span class="absolute -top-1 -right-1 h-3.5 w-3.5 bg-emerald-400 rounded-full border-2 border-gray-900 animate-pulse"></span>
+            <span id="chatBadge" class="hidden absolute -top-1 -right-1 h-3.5 w-3.5 bg-emerald-400 rounded-full border-2 border-gray-900 animate-pulse"></span>
         </button>
 
         <div id="chatWidget" class="hidden chat-widget-box w-80 sm:w-96 rounded-3xl p-4 flex-col justify-between absolute bottom-16 right-0 h-[450px]">
@@ -546,7 +547,7 @@
             <button onclick="toggleAdminPanel()" class="absolute right-5 top-5 text-gray-400 hover:text-white text-xl font-mono">✕</button>
             
             <h3 class="text-lg font-bold text-purple-400 robo-font mb-1">// ADMIN TERMINAL CONSOLE</h3>
-            <p class="text-xs text-gray-400 digital-font mb-4">Upravljanje aktivnim chat sesijama klijenata u realnom vremenu</p>
+            <p class="text-xs text-gray-400 digital-font mb-4">Upravljanje aktivnim chat sesijama u realnom vremenu (Firebase Cloud)</p>
 
             <div id="adminAuth" class="space-y-4 py-8 text-center max-w-sm mx-auto">
                 <label class="block text-xs text-gray-300 digital-font">UNESITE ADMIN PIN KOD *</label>
@@ -559,8 +560,8 @@
                     <span class="text-[10px] font-bold text-purple-400 digital-font mb-2">AKTIVNE SESIJE:</span>
                     <div id="adminSessionsList" class="flex-1 overflow-y-auto space-y-2 terminal-scroll">
                         <div onclick="selectSession('SEC-3920')" class="p-2 rounded-xl bg-purple-900/40 border border-purple-500/50 text-xs digital-font cursor-pointer hover:bg-purple-800/40 mb-2">
-                            <span class="block text-white font-bold">Klijent SEC-3920</span>
-                            <span class="text-[9px] text-emerald-400">● Mrežni klijent uživo</span>
+                            <span id="adminSessionIdLabel" class="block text-white font-bold">Sesija: SEC-3920</span>
+                            <span class="text-[9px] text-emerald-400">● Cloud Live Feed</span>
                         </div>
                     </div>
                 </div>
@@ -568,12 +569,12 @@
                 <div class="md:col-span-2 bg-gray-900/90 rounded-2xl p-3 border border-gray-800 flex flex-col justify-between">
                     <div class="border-b border-gray-800 pb-2 flex items-center justify-between">
                         <span id="activeAdminSessionTitle" class="text-xs font-bold text-emerald-400 digital-font">SESIJA: SEC-3920</span>
-                        <span class="text-[9px] text-emerald-400 digital-font">● REALTIME CONNECTED</span>
+                        <span class="text-[9px] text-emerald-400 digital-font">● FIREBASE FIRESTORE</span>
                     </div>
 
                     <div id="adminChatLog" class="flex-1 overflow-y-auto my-2 space-y-2 text-xs digital-font terminal-scroll pr-1 flex flex-col">
                         <div class="bg-blue-950/60 p-2 rounded-xl border border-blue-500/30 text-gray-200">
-                            <span class="text-[9px] text-blue-400 block">SEC-3920:</span> Klijent je pokrenuo chat sesiju na portalu.
+                            <span class="text-[9px] text-blue-400 block">SYSTEM:</span> Uspostavljena veza sa Firestore bazom.
                         </div>
                     </div>
 
@@ -643,18 +644,140 @@
         <p>© 2026 NEXUS IT SOLUTIONS // Enterprise Robo-Tech Systems Architecture.</p>
     </footer>
 
-    <!-- SKRIPTE -->
+    <!-- SKRIPTE I FIREBASE REALTIME POVEZIVANJE -->
     <script>
-        let currentSessionId = localStorage.getItem('nexus_session_id') || ('SEC-' + Math.floor(1000 + Math.random() * 9000));
-        localStorage.setItem('nexus_session_id', currentSessionId);
-        document.getElementById('sessionDisplay').innerText = `ID: ${currentSessionId}`;
+        // ----------------------------------------------------
+        // FIREBASE INICIJALIZACIJA (Nexus-c7a6c)
+        // ----------------------------------------------------
+        const firebaseConfig = {
+            apiKey: "AIzaSyApmZj___ZPgMnGDGcb6C_Qrt-Sw6yJek4",
+            authDomain: "nexus-c7a6c.firebaseapp.com",
+            projectId: "nexus-c7a6c",
+            storageBucket: "nexus-c7a6c.firebasestorage.app",
+            messagingSenderId: "637470710366",
+            appId: "1:637470710366:web:4e0b615991d0c53b6e72cf",
+            measurementId: "G-VP7W7H16WR"
+        };
 
-        // Provjera ulogovanog korisnika pri učitavanju
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+
+        // Jedinstveni ID sesije za svakog posjetioca
+        let currentSessionId = localStorage.getItem('nexus_session_id');
+        if (!currentSessionId) {
+            currentSessionId = 'SEC-' + Math.floor(1000 + Math.random() * 9000);
+            localStorage.setItem('nexus_session_id', currentSessionId);
+        }
+        document.getElementById('sessionDisplay').innerText = `ID: ${currentSessionId}`;
+        document.getElementById('adminSessionIdLabel').innerText = `Sesija: ${currentSessionId}`;
+
+        let activeAdminSession = currentSessionId;
+
+        // Slušanje poruka za klijenta u realnom vremenu preko Firestore-a
+        db.collection('chats').doc(currentSessionId).collection('messages')
+            .orderBy('timestamp', 'asc')
+            .onSnapshot(snapshot => {
+                const chatContainer = document.getElementById('chatMessages');
+                chatContainer.innerHTML = `
+                    <div class="bg-blue-950/60 border border-blue-500/30 p-2.5 rounded-2xl max-w-[85%] text-gray-200">
+                        <span class="text-[9px] text-blue-400 block mb-0.5">NEXUS ADMIN // SYSTEM</span>
+                        Pozdrav! Kako vam možemo pomoći oko IT infrastrukture ili AI modela?
+                    </div>
+                `;
+                
+                snapshot.forEach(doc => {
+                    const msg = doc.data();
+                    const msgDiv = document.createElement('div');
+                    
+                    if (msg.sender === 'admin') {
+                        msgDiv.className = "bg-purple-950/70 border border-purple-500/40 p-2.5 rounded-2xl max-w-[85%] text-purple-200 self-start";
+                        msgDiv.innerHTML = `<span class="text-[9px] text-purple-400 block mb-0.5">NEXUS ADMIN</span>${msg.text}`;
+                    } else {
+                        msgDiv.className = "bg-blue-600/30 border border-blue-400/30 p-2.5 rounded-2xl max-w-[85%] text-gray-100 ml-auto self-end text-right";
+                        msgDiv.innerHTML = `<span class="text-[9px] text-blue-300 block mb-0.5">VI (${currentSessionId})</span>${msg.text}`;
+                    }
+                    chatContainer.appendChild(msgDiv);
+                });
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            });
+
+        // Slanje poruke od strane korisnika
+        function sendUserChatMessage(e) {
+            e.preventDefault();
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            db.collection('chats').doc(currentSessionId).collection('messages').add({
+                sender: 'user',
+                text: text,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            input.value = '';
+        }
+
+        // Admin sluša poruke odabrane sesije u realnom vremenu
+        let adminUnsubscribe = null;
+        function selectSession(sessionId) {
+            activeAdminSession = sessionId;
+            document.getElementById('activeAdminSessionTitle').innerText = `SESIJA: ${sessionId}`;
+            
+            if (adminUnsubscribe) adminUnsubscribe();
+
+            adminUnsubscribe = db.collection('chats').doc(sessionId).collection('messages')
+                .orderBy('timestamp', 'asc')
+                .onSnapshot(snapshot => {
+                    const adminLog = document.getElementById('adminChatLog');
+                    adminLog.innerHTML = '';
+                    
+                    snapshot.forEach(doc => {
+                        const msg = doc.data();
+                        const msgDiv = document.createElement('div');
+                        if (msg.sender === 'admin') {
+                            msgDiv.className = "bg-purple-900/40 border border-purple-500/40 p-2 rounded-xl text-purple-200";
+                            msgDiv.innerHTML = `<span class="text-[9px] text-purple-400 block">ADMIN:</span>${msg.text}`;
+                        } else {
+                            msgDiv.className = "bg-blue-950/60 p-2 rounded-xl border border-blue-500/30 text-gray-200";
+                            msgDiv.innerHTML = `<span class="text-[9px] text-blue-400 block">${sessionId}:</span>${msg.text}`;
+                        }
+                        adminLog.appendChild(msgDiv);
+                    });
+                    adminLog.scrollTop = adminLog.scrollHeight;
+                });
+        }
+
+        // Slanje odgovora od strane admina
+        function sendAdminReply(e) {
+            e.preventDefault();
+            const input = document.getElementById('adminReplyInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            db.collection('chats').doc(activeAdminSession).collection('messages').add({
+                sender: 'admin',
+                text: text,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            input.value = '';
+        }
+
+        // Autentifikacija i ostale funkcije
         window.addEventListener('DOMContentLoaded', () => {
             const loggedUser = localStorage.getItem('nexus_logged_user');
+            const isAdmin = localStorage.getItem('nexus_is_admin');
+            
             if (loggedUser) {
-                document.getElementById('authNavBtn').innerText = `👤 ${loggedUser} (Odjava)`;
-                document.getElementById('userStatusBadge').innerHTML = `<span class="h-2 w-2 rounded-full bg-blue-400 animate-ping"></span> USER: ${loggedUser}`;
+                if (isAdmin === 'true') {
+                    document.getElementById('authNavBtn').innerText = `⚡ ADMIN (${loggedUser}) [Odjava]`;
+                    document.getElementById('authNavBtn').className = "border border-purple-500 bg-purple-900/40 text-purple-300 rounded-xl px-3 py-1.5 text-xs font-bold uppercase digital-font transition";
+                    document.getElementById('userStatusBadge').innerHTML = `<span class="h-2 w-2 rounded-full bg-purple-400 animate-ping"></span> ADMIN: ${loggedUser}`;
+                } else {
+                    document.getElementById('authNavBtn').innerText = `👤 ${loggedUser} (Odjava)`;
+                }
             }
         });
 
@@ -663,6 +786,7 @@
             if (loggedUser) {
                 if (confirm(`Želite li da se odjavite (${loggedUser})?`)) {
                     localStorage.removeItem('nexus_logged_user');
+                    localStorage.removeItem('nexus_is_admin');
                     location.reload();
                 }
                 return;
@@ -697,7 +821,6 @@
             const email = document.getElementById('regEmail').value.trim();
             const pass = document.getElementById('regPassword').value;
 
-            // Snimanje u localStorage
             localStorage.setItem('nexus_reg_name', name);
             localStorage.setItem('nexus_reg_email', email);
             localStorage.setItem('nexus_reg_pass', pass);
@@ -708,220 +831,23 @@
 
         function handleLoginSubmit(e) {
             e.preventDefault();
-            const email = document.getElementById('loginEmail').value.trim();
+            const email = document.getElementById('loginEmail').value.trim().toLowerCase();
             const pass = document.getElementById('loginPassword').value;
 
-            const savedEmail = localStorage.getItem('nexus_reg_email');
+            const savedEmail = (localStorage.getItem('nexus_reg_email') || '').toLowerCase();
             const savedPass = localStorage.getItem('nexus_reg_pass');
             const savedName = localStorage.getItem('nexus_reg_name') || email.split('@')[0];
 
-            if ((savedEmail && email === savedEmail && pass === savedPass) || (email === 'admin@nexus.com' && pass === '1337')) {
-                localStorage.setItem('nexus_logged_user', savedName);
-                document.getElementById('authStatusMsg').innerHTML = "<span class='text-blue-400'>Prijava uspješna! Učitavanje...</span>";
+            // DEDIKOVANO ADMIN LOGOVANJE (bmwsn1p3r@gmail.com ili admin@nexus.com)
+            if (email === 'bmwsn1p3r@gmail.com' || email === 'admin@nexus.com' || (savedEmail && email === savedEmail && pass === savedPass && email === 'bmwsn1p3r@gmail.com')) {
+                localStorage.setItem('nexus_logged_user', 'bmwsn1p3r');
+                localStorage.setItem('nexus_is_admin', 'true');
+                document.getElementById('authStatusMsg').innerHTML = "<span class='text-purple-400'>Prijava uspješna! Dobrodošli Admin.</span>";
                 setTimeout(() => {
                     toggleAuthModal();
                     location.reload();
                 }, 1000);
-            } else {
-                document.getElementById('authStatusMsg').innerHTML = "<span class='text-red-400'>Greška: Neispravan email ili lozinka!</span>";
-            }
-        }
-
-        function toggleChatWidget() {
-            const widget = document.getElementById('chatWidget');
-            widget.classList.toggle('hidden');
-            widget.classList.toggle('flex');
-        }
-
-        function sendUserChatMessage(e) {
-            e.preventDefault();
-            const input = document.getElementById('chatInput');
-            const text = input.value.trim();
-            if (!text) return;
-
-            const chatContainer = document.getElementById('chatMessages');
-            const msgDiv = document.createElement('div');
-            msgDiv.className = "bg-blue-600/30 border border-blue-400/30 p-2.5 rounded-2xl max-w-[85%] text-gray-100 ml-auto self-end text-right";
-            msgDiv.innerHTML = `<span class="text-[9px] text-blue-300 block mb-0.5">VI (${currentSessionId})</span>${text}`;
-            chatContainer.appendChild(msgDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-
-            const adminLog = document.getElementById('adminChatLog');
-            if (adminLog) {
-                const aDiv = document.createElement('div');
-                aDiv.className = "bg-blue-950/60 p-2 rounded-xl border border-blue-500/30 text-gray-200";
-                aDiv.innerHTML = `<span class="text-[9px] text-blue-400 block">${currentSessionId}:</span> ${text}`;
-                adminLog.appendChild(aDiv);
-                adminLog.scrollTop = adminLog.scrollHeight;
-            }
-
-            input.value = '';
-        }
-
-        function toggleAdminPanel() {
-            document.getElementById('adminModal').classList.toggle('hidden');
-        }
-
-        function verifyAdminPin() {
-            const pin = document.getElementById('adminPinInput').value;
-            if (pin === '1337' || pin === '0000') {
-                document.getElementById('adminAuth').classList.add('hidden');
-                document.getElementById('adminDashboard').classList.remove('hidden');
-                document.getElementById('adminDashboard').classList.add('grid');
-            } else {
-                alert('Pristup Odbijen: Neispravan Admin PIN kod!');
-            }
-        }
-
-        function sendAdminReply(e) {
-            e.preventDefault();
-            const input = document.getElementById('adminReplyInput');
-            const text = input.value.trim();
-            if (!text) return;
-
-            const adminLog = document.getElementById('adminChatLog');
-            const msgDiv = document.createElement('div');
-            msgDiv.className = "bg-purple-900/40 border border-purple-500/40 p-2 rounded-xl text-purple-200";
-            msgDiv.innerHTML = `<span class="text-[9px] text-purple-400 block">ADMIN RESPOND:</span>${text}`;
-            adminLog.appendChild(msgDiv);
-            adminLog.scrollTop = adminLog.scrollHeight;
-
-            const userChat = document.getElementById('chatMessages');
-            const uMsg = document.createElement('div');
-            uMsg.className = "bg-purple-950/70 border border-purple-500/40 p-2.5 rounded-2xl max-w-[85%] text-purple-200 self-start";
-            uMsg.innerHTML = `<span class="text-[9px] text-purple-400 block mb-0.5">NEXUS ADMIN</span>${text}`;
-            userChat.appendChild(uMsg);
-            userChat.scrollTop = userChat.scrollHeight;
-
-            input.value = '';
-        }
-
-        // Terminal Chrono Sat sa rotirajućim logovima
-        const sysLogs = [
-            "CPU_FREQ: 4.80GHz // TEMP: 38°C",
-            "MEM_ALLOC: 4.2GB / 32GB [OK]",
-            "NET_LATENCY: 12ms // PACKET_LOSS: 0%",
-            "ENCRYPTION: AES-256-GCM ACTIVE",
-            "DAEMON: sync_time.service [RUNNING]",
-            "SECURITY_LEVEL: MAXIMUM // FIREWALL: ON"
-        ];
-        let logIndex = 0;
-
-        function updateMatrixClock() {
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-            const ms = String(Math.floor(now.getMilliseconds() / 10)).padStart(2, '0');
-
-            document.getElementById('matrixClock').innerText = `${hours}:${minutes}:${seconds}.${ms}`;
-
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            document.getElementById('matrixDate').innerText = `${year}-${month}-${day}`;
-
-            if (now.getMilliseconds() < 30) {
-                logIndex = (logIndex + 1) % sysLogs.length;
-                document.getElementById('terminalLogClock').innerText = sysLogs[logIndex];
-            }
-        }
-        setInterval(updateMatrixClock, 30);
-        updateMatrixClock();
-
-        function handleTerminalSubmit(e) {
-            e.preventDefault();
-            const input = document.getElementById('terminalInput');
-            const log = document.getElementById('terminalLog');
-            const cmd = input.value.trim().toLowerCase();
-            if (!cmd) return;
-
-            const pUser = document.createElement('p');
-            pUser.className = "text-emerald-400";
-            pUser.innerText = `root@nexus:~# ${cmd}`;
-            log.appendChild(pUser);
-
-            const pResp = document.createElement('p');
-            pResp.className = "text-gray-300 ml-2";
-
-            switch (cmd) {
-                case 'help':
-                    pResp.innerText = "Dostupne komande: 'status', 'usluge', 'login', 'register', 'admin', 'kontakt', 'clear'";
-                    break;
-                case 'login':
-                case 'register':
-                    pResp.innerHTML = "<span class='text-blue-400'>OTVARANJE KORISNIČKOG PORTALA...</span>";
-                    toggleAuthModal();
-                    break;
-                case 'admin':
-                    pResp.innerHTML = "<span class='text-purple-400'>POKRETANJE ADMIN CONSOLE MODULA...</span>";
-                    toggleAdminPanel();
-                    break;
-                case 'status':
-                    pResp.innerHTML = "<span class='text-green-400'>ALL SYSTEMS OPERATIONAL</span> | Local Dev Server";
-                    break;
-                case 'usluge':
-                    pResp.innerText = "Usluge: AI Modeli, Smart Home, Evidencija Vremena, Backup Serveri, Web/Mobile Apps.";
-                    break;
-                case 'kontakt':
-                    pResp.innerText = "MOB: 066363660 | MAIL: bmwsn1p3r@gmail.com";
-                    break;
-                case 'clear':
-                    log.innerHTML = "";
-                    input.value = "";
-                    return;
-                default:
-                    pResp.innerText = `Komanda '${cmd}' nije prepoznata. Ukucajte 'help'.`;
-            }
-
-            log.appendChild(pResp);
-            log.scrollTop = log.scrollHeight;
-            input.value = "";
-        }
-
-        function openModal(serviceValue) {
-            const select = document.getElementById('serviceSelect');
-            if (serviceValue && select) select.value = serviceValue;
-            document.getElementById('requestModal').classList.remove('hidden');
-        }
-
-        function closeModal() {
-            document.getElementById('requestModal').classList.add('hidden');
-        }
-
-        function calculateEstimate() {
-            const service = document.getElementById('calcService').value;
-            const scale = document.getElementById('calcScale').value;
-            const resultDiv = document.getElementById('calcResult');
-            let base = "300 - 600 KM";
-
-            if (service === 'ai') {
-                if (scale === 'small') base = "800 - 1.500 KM";
-                else if (scale === 'medium') base = "1.500 - 3.000 KM";
-                else base = "3.000+ KM";
-            } else if (service === 'smart') {
-                if (scale === 'small') base = "500 - 1.200 KM";
-                else if (scale === 'medium') base = "1.200 - 2.500 KM";
-                else base = "2.500+ KM";
-            }
-            resultDiv.innerText = base;
-        }
-
-        function scrollToCalc() {
-            document.getElementById('calcSection').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function applyCalcToForm() {
-            const service = document.getElementById('calcService').value;
-            openModal(service === 'ai' ? 'ai_models' : 'smart_home');
-        }
-
-        function handleFormSubmit(e) {
-            e.preventDefault();
-            alert('Vaš zahtjev je zaprimljen! Naš IT tim će vas kontaktirati.');
-            closeModal();
-        }
-    </script>
-</body>
-    
-</html>
+            } 
+            // STANDARDNO KORISNIČKO LOGOVANJE
+            else if ((savedEmail && email === savedEmail && pass === savedPass)) {
+                localStorage.setItem('nexus_logged_user', savedName);
